@@ -1,6 +1,7 @@
 # Timef
 
 ![Usage](./gallery/vid.gif)
+Note: it appears to be that the gif version is slowed down, however, it updates itself real-time, every second.
 
 Timef is a simple program that outputs the current system time in a stylized way into console.
 
