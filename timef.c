@@ -250,7 +250,7 @@ int main(int argc, char **argv)
 
         else if (dayfmt == 0 && h != NULL) {
             sprintf(h, "%i", (atoi(h)));
-            sprintf(h, (m != NULL && s != NULL) ? "%s:" : "%s ", h);
+            sprintf(h, (m != NULL && s != NULL) ? "%s:" : (s!=NULL)?"%s:":"%s ", h);
             strcat(output, h);
         }
         
@@ -261,7 +261,7 @@ int main(int argc, char **argv)
 
         if (dayfmt == 1 && s != NULL) {
             sprintf(s, "%s %s" "%s", s, atoi(h) > 12? "PM":"AM", y != NULL ? " - ": "" );
-            printf("%s", s); 
+            strcat(output, s);
         }
 
         else if (dayfmt == 0 && s != NULL) {
