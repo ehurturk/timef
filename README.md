@@ -43,6 +43,8 @@ Example usage:
 
 To quit, press `q` and you will return back to your classic terminal screen.
 
+Important Note: I've tried to implement non-blocking user input, which I am fairly new to, and if you press a key different than `q`, and then press `q`, the program would wait a few-seconds multiplied by how many non-`q` keys you have pressed, then it would exit. 
+
 When using the flag -1, there would be additional "AM" or "PM" next to seconds.
 
 ## Uninstall
