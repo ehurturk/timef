@@ -1,5 +1,7 @@
 # Timef
 
+![Usage](./gallery/vid.gif)
+
 Timef is a simple program that outputs the current system time in a stylized way into console.
 
 It was a simple practice project for me - don't expect much functionality.
