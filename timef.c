@@ -58,7 +58,10 @@ void turnechooff() {
 
 
 void render() {
-
+    /* TODO: Render ASCII art here */
+    /*
+        honestly, I guess it would be a difficult job to render and update ASCII art. I will try to implement it though.
+    */
 }
 
 
@@ -157,10 +160,10 @@ int main(int argc, char **argv)
     system("clear");
     goto_center(size.ws_col, size.ws_row, str_len); /* goto center, place the cursor into the very center */
          
+    fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
     while (1) 
     {
         char c = '\0';
-        fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
         read(STDIN_FILENO, &c, 1);
         if (c == 'q') {
             cleanup();   
