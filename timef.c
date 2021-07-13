@@ -26,22 +26,32 @@
 #include <sys/ioctl.h> /* unix */
 
 #define MAX_OUTPUT_LEN 28
-        
-void print_centered(int w, int h, const char *str) {
-    int center_col = w / 2;
-    int center_row = h / 2;
-    int half_len = strlen(str) / 2;
-    int adj_col = center_col - half_len;
-    for (int i = 0; i < adj_col; i++) {
 
+/* goto center */
+void goto_center(int w, int h, int len) {
+    int center_c = w /2;
+    int center_row = h/2;
+    int half_len = len / 2;
+    int adj_col = center_c - half_len;
+    for (int i = 0; i < center_row; i++) {
+        printf("\n");
     }
+    /* now the cursor is placed at the very center of the terminal to print the selected string */
+}
+
+void render() {
+
 }
 
 int main(int argc, char **argv)
 {
     struct winsize size;
-    char *output = malloc(sizeof(char) * MAX_OUTPUT_LEN);
     ioctl(0, TIOCGWINSZ, (char *) &size);
+    system("clear");
+    /* print_centered(size.ws_col, size.ws_row, "Hello there!\n"); */
+    
+    int str_len = 0;
+    char *output = malloc(sizeof(char) * MAX_OUTPUT_LEN);
     char *wday = NULL;
 
     char *mon = NULL;
@@ -52,9 +62,8 @@ int main(int argc, char **argv)
     char *y = NULL; 
 
 
-    int dayfmt = 0; /* default 24 hr format */
+    int dayfmt = 0; 
     int c = 0;
-    /* Dynamic Memory Allocation is on startup, not in loop - shouldn't be a problem thereof */
     while (--argc > 0 && (*++argv)[0] == '-')
     {
         while ((c = *++argv[0]))
@@ -63,36 +72,46 @@ int main(int argc, char **argv)
             {
                 case 's':
                     s = malloc(sizeof(char) * 3);
+                    str_len += 3;
                     break;
                 case 'm':                
                     m = malloc(sizeof(char) * 3);
+                    str_len += 3;
                     break;
                 case 'h':            
                     h = malloc(sizeof(char) * 3);
+                    str_len += 2;
                     break;
                 case 'y':
                     y = malloc(sizeof(char) * 5);
+                    str_len += 4;
                     break;
                 case 'd':
                     day = malloc(sizeof(char) * 3);
+                    str_len += 3; /* additional / char */
                     break;
                 case 'M':
                     mon = malloc(sizeof(char) * 4);
+                    str_len += 4; /* additional / char */
                     break;
                 case 'D':
                     wday = malloc(sizeof(char) * 4);
+                    str_len += 3;
                     break;
                 case '1':
-                    dayfmt = 1; /* enable 12 hr format */
+                    dayfmt = 1; 
                 default:
                     break;
             }
         }
     }
 
+    /* str_len += 6; */
+    str_len -= 10;
     system("clear");
-    
-    while (1) /* TODO: When q is pressed, exit */
+    goto_center(size.ws_col, size.ws_row, str_len); /* goto center, place the cursor into the very center */
+         
+    while (1) 
     {
 
         time_t _time = time(NULL);
@@ -153,78 +172,67 @@ int main(int argc, char **argv)
             y[4] = '\0';
         }
         
-        /* TODO: Print ASCII art (3D) */
 
-        /* char *output = malloc(sizeof(char) * MAX_OUTPUT_LEN); */
-        /* char output[MAX_OUTPUT_LEN]; */
         if (wday != NULL) {
-            sprintf(wday, "%s/", wday);
+            if (mon != NULL || (mon == NULL && day != NULL))    sprintf(wday, "%s/", wday);
+            else if (mon == NULL && day == NULL)                sprintf(wday, "%s - ", wday);
             strcat(output, wday);
-            /* printf("%s", wday); */
         }
 
         if (mon != NULL) {
-            sprintf(mon, "%s/", mon);
+            if (day != NULL)                                    sprintf(mon, "%s/", mon);
+            else                                                sprintf(mon, "%s - ", mon);
             strcat(output, mon);
-            /* printf("%s", mon); */
         }
 
         if (day != NULL) {
             sprintf(day, "%s - ", day);
             strcat(output, day);
-            /* printf("%s", day); */
         }
 
-        if (dayfmt == 1 && h != NULL) { /* 12 hr string formatting */
+        if (dayfmt == 1 && h != NULL) { 
             sprintf(h, "%i", (atoi(h) % 12));
             sprintf(h, (m != NULL && s != NULL) ? "%s:" : "%s ", h);
             strcat(output, h);
-            /* printf("%s", h); */
         }
 
         else if (dayfmt == 0 && h != NULL) {
             sprintf(h, "%i", (atoi(h)));
             sprintf(h, (m != NULL && s != NULL) ? "%s:" : "%s ", h);
             strcat(output, h);
-            /* printf("%s", h);     */
-            
         }
         
         if (m != NULL) {
             sprintf(m, s != NULL ? "%s:" : "%s - ", m);
             strcat(output, m);
-            /* printf("%s", m); */
         }
 
         if (dayfmt == 1 && s != NULL) {
             sprintf(s, "%s %s" "%s", s, atoi(h) > 12? "PM":"AM", y != NULL ? " - ": "" );
-            /* strcat(output, s); */
             printf("%s", s); 
         }
 
         else if (dayfmt == 0 && s != NULL) {
             sprintf(s, "%s" "%s", s, y != NULL ? " - ": "" );
             strcat(output, s);
-            /* printf("%s", s); */
         }
         
         if (y != NULL)
             strcat(output, y);
-            /* printf("%s", y); */
         
         strcat(output, "\0");
-
+        /* crucial: print the blank lines to center the text */
+        for (int i = 0; i < size.ws_col / 2 - str_len; i++) {
+            printf(" ");
+        }
         printf("%s", output);
-        printf("\r");
-        memset(output, 0, strlen(output)); /* empty the string but preserve the allocated memory */
-        //output = NULL; /* first NULL, so at next iteration the string would be zeroed */
-        // free(output); /* the free the memory allocated before, since at each iteration we are mallocing new memory */
-        /* TODO: Just allocate the memory at start, then each iteration set it to NULL, then free it. */
+        printf("\r"); /* TODO: Override the printed line, not the previous line */
+        memset(output, 0, strlen(output)); 
         fflush(stdout);
         sleep(1);
     }
     printf("\n");
-    /* Resource Deallocation */
+
     free(output);
     free(wday);
     free(mon);
@@ -233,7 +241,7 @@ int main(int argc, char **argv)
     free(m);
     free(s);
     free(y);
-
+    
 }
 
 
