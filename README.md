@@ -18,6 +18,7 @@ If you encounter a problem in `make install`, try adding sudo to the beginning o
 ## Usage
 To use the program, type `./timef -[flags]` into your terminal.
 All possible flags are:
+
   💡 -s : show seconds
   💡 -m : show minutes
   💡 -h : show hours
