@@ -24,8 +24,11 @@
 #include <unistd.h> /* unix */
 #include <termios.h> /* unix */
 #include <sys/ioctl.h> /* unix */
+#include <fcntl.h> /* unix */
 
 #define MAX_OUTPUT_LEN 28
+
+struct termios orig_term;
 
 /* goto center */
 void goto_center(int w, int h, int len) {
@@ -39,27 +42,70 @@ void goto_center(int w, int h, int len) {
     /* now the cursor is placed at the very center of the terminal to print the selected string */
 }
 
+void turnechoon() {
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_term);
+}
+
+void turnechooff() {
+    tcgetattr(STDIN_FILENO, &orig_term);
+    atexit(turnechoon);
+    struct termios raw = orig_term;
+    tcgetattr(STDIN_FILENO, &raw);
+
+    raw.c_lflag &= ~(ECHO | ICANON); /* flip both the 4th bit and the 3rd bit of the local flags to turn off echo and canon mode */
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+}
+
+
 void render() {
+
+}
+
+
+char *output;
+
+char *wday;
+char *mon; 
+char *day; 
+char *h;
+char *m;
+char *s;
+char *y;
+
+void cleanup() {
+    system("clear");
+    printf("\n");
+    
+    if (output != NULL) free(output);
+    
+    if (wday != NULL)   free(wday);
+    if (mon != NULL)    free(mon);
+    if (day != NULL)    free(day);
+    if (h != NULL)      free(h);
+    if (m != NULL)      free(m);
+    if (s != NULL)      free(s);
+    if (y != NULL)      free(y);
 
 }
 
 int main(int argc, char **argv)
 {
+    turnechooff();
     struct winsize size;
     ioctl(0, TIOCGWINSZ, (char *) &size);
     system("clear");
     /* print_centered(size.ws_col, size.ws_row, "Hello there!\n"); */
     
     int str_len = 0;
-    char *output = malloc(sizeof(char) * MAX_OUTPUT_LEN);
-    char *wday = NULL;
+    output = malloc(sizeof(char) * MAX_OUTPUT_LEN);
+    wday = NULL;
 
-    char *mon = NULL;
-    char *day = NULL; 
-    char *h = NULL; 
-    char *m = NULL; 
-    char *s = NULL; 
-    char *y = NULL; 
+    mon = NULL;
+    day = NULL; 
+    h = NULL; 
+    m = NULL; 
+    s = NULL; 
+    y = NULL; 
 
 
     int dayfmt = 0; 
@@ -113,7 +159,13 @@ int main(int argc, char **argv)
          
     while (1) 
     {
-
+        char c = '\0';
+        fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
+        read(STDIN_FILENO, &c, 1);
+        if (c == 'q') {
+            cleanup();   
+            return 0;
+        }
         time_t _time = time(NULL);
         char *time_str = ctime(&_time);
         time_str[strlen(time_str) - 1] = '\0';
@@ -226,21 +278,14 @@ int main(int argc, char **argv)
             printf(" ");
         }
         printf("%s", output);
-        printf("\r"); /* TODO: Override the printed line, not the previous line */
+        printf("\r"); 
         memset(output, 0, strlen(output)); 
         fflush(stdout);
         sleep(1);
     }
-    printf("\n");
 
-    free(output);
-    free(wday);
-    free(mon);
-    free(day);
-    free(h);
-    free(m);
-    free(s);
-    free(y);
+    cleanup();
+    return 0;
     
 }
 
