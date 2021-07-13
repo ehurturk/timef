@@ -20,13 +20,21 @@ To use the program, type `./timef -[flags]` into your terminal.
 All possible flags are:
 
   💡 -s : show seconds
+
   💡 -m : show minutes
+
   💡 -h : show hours
+
   💡 -y : show years
+
   💡 -d : show days
+
   💡 -D : show names of the days
+
   💡 -M : show months
+
   💡 -2 : show hours in 24h format (default 24 hour format if no -1 is specified)
+
   💡 -1 : show hours in 12h format
 
 Example usage:
