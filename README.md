@@ -4,7 +4,7 @@ Timef is a simple program that outputs the current system time in a stylized way
 
 It was a simple practice project for me - don't expect much functionality.
 
-Timef only works in UNIX-like systems since it uses headers that only exist on UNIX systems.
+Timef only works in UNIX-like systems since it uses headers that only exist and heavily depend on UNIX systems.
 
 ## Build & Install
 As previously mentioned, the program is for UNIX systems, not for Windows.
@@ -40,6 +40,8 @@ All possible flags are:
 Example usage:
 `timef -s -m -h -d -D -M -2 -y` - which would output:
 `Tue/Jul/13 - 18:14:26 - 2021`.
+
+To quit, press `q` and you will return back to your classic terminal screen.
 
 When using the flag -1, there would be additional "AM" or "PM" next to seconds.
 
