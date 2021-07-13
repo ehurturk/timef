@@ -39,7 +39,7 @@ void print_centered(int w, int h, const char *str) {
 int main(int argc, char **argv)
 {
     struct winsize size;
-
+    char *output = malloc(sizeof(char) * MAX_OUTPUT_LEN);
     ioctl(0, TIOCGWINSZ, (char *) &size);
     char *wday = NULL;
 
@@ -154,7 +154,7 @@ int main(int argc, char **argv)
         
         /* TODO: Print ASCII art (3D) */
 
-        char *output = malloc(sizeof(char) * MAX_OUTPUT_LEN);
+        /* char *output = malloc(sizeof(char) * MAX_OUTPUT_LEN); */
         /* char output[MAX_OUTPUT_LEN]; */
         if (wday != NULL) {
             sprintf(wday, "%s/", wday);
@@ -215,14 +215,16 @@ int main(int argc, char **argv)
 
         printf("%s", output);
         printf("\r");
-        output = NULL; /* first NULL, so at next iteration the string would be zeroed */
-        free(output); /* the free the memory allocated before, since at each iteration we are mallocing new memory */
+        memset(output, 0, strlen(output)); /* empty the string but preserve the allocated memory */
+        //output = NULL; /* first NULL, so at next iteration the string would be zeroed */
+        // free(output); /* the free the memory allocated before, since at each iteration we are mallocing new memory */
         /* TODO: Just allocate the memory at start, then each iteration set it to NULL, then free it. */
         fflush(stdout);
         sleep(1);
     }
     printf("\n");
     /* Resource Deallocation */
+    free(output);
     free(wday);
     free(mon);
     free(day);
