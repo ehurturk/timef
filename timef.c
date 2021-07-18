@@ -16,7 +16,6 @@
     Example Usage: ./timef -s -m -h -2 would output: 13:30:34
 */
 
-
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
@@ -27,8 +26,27 @@
 #include <fcntl.h> /* unix */
 
 #define MAX_OUTPUT_LEN 28
+#define ROW 8
+#define COL 13
+#define CHAR_C  17
+
+/* All possible letters for the time output:
+ * Jan, Feb, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec 
+ * => A, D, F, J, M, N, S, O, a, b, c, e, l, n, o, p, r, t, u, v
+*/
+
+enum alph {
+    A, D, F, J, M, N, S, O, b, c, e, l, p, r, t, u, v
+};
 
 struct termios orig_term;
+
+struct ascii_char {
+    char *line[ROW];
+};
+
+struct ascii_char art[CHAR_C];
+
 
 /* goto center */
 void goto_center(int w, int h, int len) {
@@ -56,12 +74,203 @@ void turnechooff() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
+void init_ascii() {
+    for (int i = 0; i < CHAR_C; i++) {
+        for (int j = 0; j < ROW; j++) {
+            art[i].line[j] = malloc(COL * sizeof(char));
+            if (art[i].line[j] == NULL) {
+                printf("Error when creating a char. \n");
+                return;
+            }
+        }
+        
+        switch ((enum alph) i) {
+            case A:
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case D:
+                strcpy(art[i].line[0], "8888888b. ");
+                strcpy(art[i].line[1], "888   Y88b");
+                strcpy(art[i].line[2], "888    888");
+                strcpy(art[i].line[3], "888    888");
+                strcpy(art[i].line[4], "888    888");
+                strcpy(art[i].line[5], "888    888");
+                strcpy(art[i].line[6], "888  .d88P");
+                strcpy(art[i].line[7], "8888888P# ");
+                break;
+            case F:
+                strcpy(art[i].line[0], "8888888888");
+                strcpy(art[i].line[1], "888       ");
+                strcpy(art[i].line[2], "888       ");
+                strcpy(art[i].line[3], "8888888888");
+                strcpy(art[i].line[4], "888       ");
+                strcpy(art[i].line[5], "888       ");
+                strcpy(art[i].line[6], "888       ");
+                strcpy(art[i].line[7], "888       ");
+                break;
+            case J:
+                strcpy(art[i].line[0], "  888888");
+                strcpy(art[i].line[1], "     88b");
+                strcpy(art[i].line[2], "     88b");
+                strcpy(art[i].line[3], "     888");
+                strcpy(art[i].line[4], "    .888");
+                strcpy(art[i].line[5], "   .d88P");
+                strcpy(art[i].line[6], "  .d88P ");
+                strcpy(art[i].line[7], ".888P   "); 
+                break;
+            case M:
+                strcpy(art[i].line[0], "888b     d888");
+                strcpy(art[i].line[1], "8888b   d8888");
+                strcpy(art[i].line[2], "88888b.d88888");
+                strcpy(art[i].line[3], "888Y88888P888");
+                strcpy(art[i].line[4], "888 Y888P 888");
+                strcpy(art[i].line[5], "888  Y8P  888");
+                strcpy(art[i].line[6], "888       888");
+                strcpy(art[i].line[7], "888       888"); 
+                break;
+            case N:
+                strcpy(art[i].line[0], "888b    888");
+                strcpy(art[i].line[1], "8888b   888");
+                strcpy(art[i].line[2], "88888b  888");
+                strcpy(art[i].line[3], "888Y88b 888");
+                strcpy(art[i].line[4], "888 Y88b888");
+                strcpy(art[i].line[5], "888  Y88888");
+                strcpy(art[i].line[6], "888   Y8888");
+                strcpy(art[i].line[7], "888    Y888");
+                break;
+            case S: 
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case O:
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case b: 
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case c: 
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case e: 
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case l:
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888"); 
+                break;
+            case p: 
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case r: 
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case t: 
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case u: 
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
+            case v:
+                strcpy(art[i].line[0], "       d8888");
+                strcpy(art[i].line[1], "      d88888");
+                strcpy(art[i].line[2], "     d88P888");
+                strcpy(art[i].line[3], "    d88P 888");
+                strcpy(art[i].line[4], "   d88P  888");
+                strcpy(art[i].line[5], "  d88P   888");
+                strcpy(art[i].line[6], " d8888888888");
+                strcpy(art[i].line[7], "d88P     888");
+                break;
 
-void render() {
+        };
+    }
+}
+
+void genasciiart(const char *raw) {
+    
+}
+
+void render(const char *raw) {
     /* TODO: Render ASCII art here */
     /*
         honestly, I guess it would be a difficult job to render and update ASCII art. I will try to implement it though.
     */
+    /* TODO: Convert the raw text into ascii art. */
+
 }
 
 
@@ -91,15 +300,53 @@ void cleanup() {
 
 }
 
+void charalloc(char ch, int *str_len, int *dayfmt) {
+    switch (ch)
+    {
+        case 's':
+            s = malloc(sizeof(char) * 3);
+            *str_len += 3;
+            break;
+        case 'm':                
+            m = malloc(sizeof(char) * 3);
+            *str_len += 3;
+            break;
+        case 'h':            
+            h = malloc(sizeof(char) * 3);
+            *str_len += 2;
+            break;
+        case 'y':
+            y = malloc(sizeof(char) * 5);
+            *str_len += 4;
+            break;
+        case 'd':
+            day = malloc(sizeof(char) * 3);
+            *str_len += 3; /* additional / char */
+            break;
+        case 'M':
+            mon = malloc(sizeof(char) * 4);
+            *str_len += 4; /* additional / char */
+            break;
+        case 'D':
+            wday = malloc(sizeof(char) * 4);
+            *str_len += 3;
+            break;
+        case '1':
+            *dayfmt = 1; 
+        default:
+            break;
+    }
+}
+
 int main(int argc, char **argv)
 {
     turnechooff();
     struct winsize size;
     ioctl(0, TIOCGWINSZ, (char *) &size);
     system("clear");
-    /* print_centered(size.ws_col, size.ws_row, "Hello there!\n"); */
     
     int str_len = 0;
+    int dayfmt = 0; 
     output = malloc(sizeof(char) * MAX_OUTPUT_LEN);
     wday = NULL;
 
@@ -110,47 +357,24 @@ int main(int argc, char **argv)
     s = NULL; 
     y = NULL; 
 
-
-    int dayfmt = 0; 
-    int c = 0;
-    while (--argc > 0 && (*++argv)[0] == '-')
-    {
-        while ((c = *++argv[0]))
+    if (argc == 1) {
+        charalloc('s' ,&str_len, &dayfmt);
+        charalloc('m' ,&str_len, &dayfmt);
+        charalloc('h' ,&str_len, &dayfmt);
+        charalloc('y' ,&str_len, &dayfmt);
+        charalloc('d' ,&str_len, &dayfmt);
+        charalloc('M' ,&str_len, &dayfmt);
+        charalloc('D' ,&str_len, &dayfmt);
+        charalloc('1', &str_len, &dayfmt);
+    }
+    
+    else {
+        int c = 0;
+        while (--argc > 0 && (*++argv)[0] == '-')
         {
-            switch (c)
+            while ((c = *++argv[0]))
             {
-                case 's':
-                    s = malloc(sizeof(char) * 3);
-                    str_len += 3;
-                    break;
-                case 'm':                
-                    m = malloc(sizeof(char) * 3);
-                    str_len += 3;
-                    break;
-                case 'h':            
-                    h = malloc(sizeof(char) * 3);
-                    str_len += 2;
-                    break;
-                case 'y':
-                    y = malloc(sizeof(char) * 5);
-                    str_len += 4;
-                    break;
-                case 'd':
-                    day = malloc(sizeof(char) * 3);
-                    str_len += 3; /* additional / char */
-                    break;
-                case 'M':
-                    mon = malloc(sizeof(char) * 4);
-                    str_len += 4; /* additional / char */
-                    break;
-                case 'D':
-                    wday = malloc(sizeof(char) * 4);
-                    str_len += 3;
-                    break;
-                case '1':
-                    dayfmt = 1; 
-                default:
-                    break;
+                charalloc(c, &str_len, &dayfmt); 
             }
         }
     }
